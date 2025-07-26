@@ -31,14 +31,36 @@
     </section>
     <section id="search-section" class="hidden">
       <h2>Search People & Organizations</h2>
-      <p class="search-help">Search by handle, name, or keywords. We'll find users by their profiles and recent posts.</p>
+      <p class="search-help">Choose your search type and find users by profiles or content.</p>
       <form id="search-form" autocomplete="off">
+        <div class="search-controls">
+          <select id="search-type" class="search-filter">
+            <option value="combined">🔍 Combined Search (Profiles + Posts)</option>
+            <option value="profiles">👤 Profiles Only (Handle/Name)</option>
+            <option value="content">📝 Content Only (Posts/Keywords)</option>
+          </select>
+        </div>
         <input type="text" id="search-query" placeholder="Enter handle, name, or keywords..." required />
         <button type="submit">Search</button>
       </form>
       <div id="results"></div>
     </section>
   </main>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">User Profile</h3>
+        <button id="close-modal" class="close-btn">&times;</button>
+      </div>
+      <div id="modal-body">
+        <div id="profile-info"></div>
+        <div id="profile-posts"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="renderer.js"></script>
 </body>
 </html>

@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Renderer: Search form submitted');
 
         const query = (document.getElementById('search-query') as HTMLInputElement)?.value;
+        const searchType = (document.getElementById('search-type') as HTMLSelectElement)?.value || 'combined';
 
         if (!query) {
             if (resultsDiv) resultsDiv.textContent = 'Please enter a search term';
@@ -135,12 +136,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (resultsDiv) resultsDiv.textContent = 'Searching...';
 
         try {
-            const result = await blueskyAPI.search(query);
+            const result = await blueskyAPI.search(query, searchType);
             console.log('Renderer: Search result', result);
 
             if (result.success && result.actors) {
                 if (result.actors.length > 0) {
-                    displayResults(result.actors);
+                    displayResults(result.actors, result.searchInfo);
                 } else {
                     if (resultsDiv) resultsDiv.textContent = 'No results found';
                 }
@@ -153,12 +154,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    function displayResults(actors: any[]) {
+    function displayResults(actors: any[], searchInfo?: string) {
         console.log('Renderer: Displaying', actors.length, 'results');
         if (!resultsDiv) return;
 
-        resultsDiv.innerHTML = actors.map(actor => `
-            <div class="result-item">
+        let infoHtml = '';
+        if (searchInfo) {
+            infoHtml = `<div class="search-info">${searchInfo}</div>`;
+        }
+
+        resultsDiv.innerHTML = infoHtml + actors.map((actor, index) => `
+            <div class="result-item" data-actor-handle="${actor.handle}" data-actor-index="${index}">
                 <div class="result-item-row">
                     <img src="${actor.avatar || 'https://placehold.co/48x48'}" alt="Profile" class="result-item-avatar">
                     <div>
@@ -170,5 +176,96 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <button class="result-item-follow">Follow</button>
             </div>
         `).join('');
+
+        // Add click handlers for profile viewing
+        resultsDiv.querySelectorAll('.result-item').forEach((item, index) => {
+            item.addEventListener('click', (e) => {
+                // Don't trigger on follow button click
+                if ((e.target as HTMLElement).classList.contains('result-item-follow')) {
+                    e.stopPropagation();
+                    return;
+                }
+                const actor = actors[index];
+                showProfileModal(actor);
+            });
+        });
+    }
+
+    // Modal functionality
+    const profileModal = document.getElementById('profile-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const modalBody = document.getElementById('modal-body');
+
+    closeModalBtn?.addEventListener('click', () => {
+        profileModal?.classList.add('hidden');
+    });
+
+    profileModal?.addEventListener('click', (e) => {
+        if (e.target === profileModal) {
+            profileModal.classList.add('hidden');
+        }
+    });
+
+    async function showProfileModal(actor: any) {
+        console.log('Renderer: Showing profile for', actor.handle);
+
+        if (!profileModal || !modalBody) return;
+
+        // Show modal with loading state
+        profileModal.classList.remove('hidden');
+        modalBody.innerHTML = '<div style="padding: 2rem; text-align: center;">Loading profile...</div>';
+
+        try {
+            const result = await blueskyAPI.getUserProfile(actor.handle);
+            console.log('Renderer: Profile result', result);
+
+            if (result.success && result.profile) {
+                displayProfile(result.profile, result.posts || []);
+            } else {
+                modalBody.innerHTML = `<div style="padding: 2rem; text-align: center; color: red;">Failed to load profile: ${result.error}</div>`;
+            }
+        } catch (err: any) {
+            console.error('Renderer: Profile error', err);
+            modalBody.innerHTML = `<div style="padding: 2rem; text-align: center; color: red;">Error loading profile: ${err.message}</div>`;
+        }
+    }
+
+    function displayProfile(profile: any, posts: any[]) {
+        if (!modalBody) return;
+
+        const postsHtml = posts.length > 0 ? `
+            <div class="posts-section">
+                <h4>Recent Posts</h4>
+                ${posts.map(feedItem => {
+            const post = feedItem.post || feedItem;
+            const createdAt = new Date(post.indexedAt || post.createdAt).toLocaleDateString();
+            return `
+                        <div class="post-item">
+                            <div class="post-content">${post.record?.text || 'No content'}</div>
+                            <div class="post-meta">${createdAt}</div>
+                        </div>
+                    `;
+        }).join('')}
+            </div>
+        ` : '<div style="padding: 1rem 1.5rem; color: #666; font-style: italic;">No recent posts available</div>';
+
+        modalBody.innerHTML = `
+            <div class="profile-section">
+                <div class="profile-header">
+                    <img src="${profile.avatar || 'https://placehold.co/80x80'}" alt="Profile" class="profile-avatar">
+                    <div class="profile-info">
+                        <h4>${profile.displayName || profile.handle}</h4>
+                        <div class="profile-handle">@${profile.handle}</div>
+                        <div class="profile-stats">
+                            <span><strong>${profile.followersCount || 0}</strong> followers</span>
+                            <span><strong>${profile.followsCount || 0}</strong> following</span>
+                            <span><strong>${profile.postsCount || 0}</strong> posts</span>
+                        </div>
+                    </div>
+                </div>
+                ${profile.description ? `<div class="profile-description">${profile.description}</div>` : ''}
+            </div>
+            ${postsHtml}
+        `;
     }
 });
