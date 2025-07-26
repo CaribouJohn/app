@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bluesky Scanner</title>
   <link rel="stylesheet" href="style.css">
@@ -26,37 +26,13 @@
       </form>
       <div id="login-message" aria-live="polite"></div>
     </section>
-    <section id="search-section" style="display:none;">
+    <section id="search-section" class="hidden">
       <h2>Search People & Organizations</h2>
       <form id="search-form" autocomplete="off">
         <input type="text" id="search-query" placeholder="Search..." required />
         <button type="submit">Search</button>
       </form>
-      <div id="results">
-        <!-- Example result items for UI demonstration -->
-        <div class="result-item">
-          <div style="display:flex;align-items:center;gap:1rem;">
-            <img src="https://placehold.co/48x48" alt="Profile" style="border-radius:50%;width:48px;height:48px;">
-            <div>
-              <strong>@janedoe.bsky.social</strong><br>
-              <span>Jane Doe</span>
-            </div>
-          </div>
-          <div style="margin-top:0.5rem;color:#1976d2;font-size:0.95rem;">Organization • 12k followers</div>
-          <button style="margin-top:0.75rem;align-self:flex-end;">Follow</button>
-        </div>
-        <div class="result-item">
-          <div style="display:flex;align-items:center;gap:1rem;">
-            <img src="https://placehold.co/48x48" alt="Profile" style="border-radius:50%;width:48px;height:48px;">
-            <div>
-              <strong>@johnsmith.bsky.social</strong><br>
-              <span>John Smith</span>
-            </div>
-          </div>
-          <div style="margin-top:0.5rem;color:#1976d2;font-size:0.95rem;">Person • 8k followers</div>
-          <button style="margin-top:0.75rem;align-self:flex-end;">Follow</button>
-        </div>
-      </div>
+      <div id="results"></div>
     </section>
   </main>
   <script src="renderer.js"></script>

@@ -1,3 +1,26 @@
+.hidden {
+  display: none;
+}
+
+.result-item-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.result-item-avatar {
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+}
+.result-item-meta {
+  margin-top: 0.5rem;
+  color: #1976d2;
+  font-size: 0.95rem;
+}
+.result-item-follow {
+  margin-top: 0.75rem;
+  align-self: flex-end;
+}
 body {
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   margin: 0;
