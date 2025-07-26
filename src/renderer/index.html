@@ -20,7 +20,10 @@
     <section id="login-section">
       <h2>Login to Bluesky</h2>
       <form id="login-form" autocomplete="on">
-        <input type="text" id="handle" placeholder="Handle or Email" required />
+        <div class="input-group">
+          <input type="text" id="handle" placeholder="Handle or Email (remembered)" required />
+          <button type="button" id="clear-username" class="clear-btn" title="Clear remembered username">✕</button>
+        </div>
         <input type="password" id="password" placeholder="App Password" required />
         <button type="submit">Login</button>
       </form>
@@ -28,8 +31,9 @@
     </section>
     <section id="search-section" class="hidden">
       <h2>Search People & Organizations</h2>
+      <p class="search-help">Search by handle, name, or keywords. We'll find users by their profiles and recent posts.</p>
       <form id="search-form" autocomplete="off">
-        <input type="text" id="search-query" placeholder="Search..." required />
+        <input type="text" id="search-query" placeholder="Enter handle, name, or keywords..." required />
         <button type="submit">Search</button>
       </form>
       <div id="results"></div>

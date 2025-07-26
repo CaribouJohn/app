@@ -9,6 +9,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const menuLogin = document.getElementById('menu-login');
     const loginSection = document.getElementById('login-section');
     const searchSection = document.getElementById('search-section');
+    const handleInput = document.getElementById('handle') as HTMLInputElement;
+
+    // Load and set the last used username
+    const lastUsername = localStorage.getItem('bluesky-last-username');
+    if (lastUsername && handleInput) {
+        handleInput.value = lastUsername;
+        console.log('Renderer: Loaded last username:', lastUsername);
+    }
+
+    // Clear username button handler
+    const clearUsernameBtn = document.getElementById('clear-username');
+    clearUsernameBtn?.addEventListener('click', () => {
+        if (handleInput) {
+            handleInput.value = '';
+            localStorage.removeItem('bluesky-last-username');
+            console.log('Renderer: Cleared remembered username');
+            handleInput.focus();
+        }
+    });
 
     function updateUI() {
         console.log('Renderer: Updating UI, logged in:', isLoggedIn);
@@ -74,6 +93,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (result.success) {
                 isLoggedIn = true;
+                // Save the username for next time
+                localStorage.setItem('bluesky-last-username', handle);
+                console.log('Renderer: Saved username for next login:', handle);
+
                 if (loginMessage) loginMessage.textContent = `Logged in as ${result.handle}`;
                 updateUI();
                 // Clear message after 2 seconds

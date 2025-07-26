@@ -2,6 +2,51 @@
   display: none;
 }
 
+.search-help {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group input {
+  flex: 1;
+  margin: 0;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 12px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.clear-btn:active {
+  background: #e0e0e0;
+}
+
 .result-item-row {
   display: flex;
   align-items: center;

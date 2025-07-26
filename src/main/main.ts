@@ -34,11 +34,42 @@ ipcMain.handle('bluesky-search', async (event, query: string) => {
         return { success: false, error: 'Not logged in' };
     }
     try {
-        const res = await agent.searchActors({ term: query });
-        console.log('Main: Search successful', res.data.actors?.length, 'results');
+        // Primary search: Search actors by handle and display name
+        const actorResults = await agent.searchActors({ term: query, limit: 25 });
+        console.log('Main: Actor search successful', actorResults.data.actors?.length, 'results');
+
+        // Secondary search: Search posts to find users who post about the topic
+        let postResults: any = { data: { posts: [] } };
+        try {
+            postResults = await agent.app.bsky.feed.searchPosts({
+                q: query,
+                limit: 20
+            });
+            console.log('Main: Post search successful', postResults.data.posts?.length, 'post results');
+        } catch (postErr) {
+            console.warn('Main: Post search failed, continuing with actor results only', postErr);
+        }
+
+        // Combine results and deduplicate
+        const actors = actorResults.data.actors || [];
+        const additionalActors = new Map();
+
+        // Extract unique actors from post search
+        if (postResults.data.posts) {
+            postResults.data.posts.forEach((post: any) => {
+                if (post.author && !actors.find((actor: any) => actor.did === post.author.did)) {
+                    additionalActors.set(post.author.did, post.author);
+                }
+            });
+        }
+
+        // Merge results
+        const allActors = [...actors, ...Array.from(additionalActors.values())];
+
+        console.log('Main: Combined search results:', allActors.length, 'unique actors');
         return {
             success: true,
-            actors: res.data.actors || []
+            actors: allActors
         };
     } catch (err: any) {
         console.error('Main: Search failed', err);
