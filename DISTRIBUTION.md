@@ -7,6 +7,7 @@ The Bluesky Scanner application successfully builds and creates a functional exe
 ## Working Solution
 
 ### ✅ **Current Distribution Method:**
+
 - **Location**: `app/dist-electron/win-unpacked/Bluesky Scanner.exe`
 - **Type**: Unpacked executable with all dependencies
 - **Status**: Fully functional - login, search, and profile viewing all work
@@ -14,6 +15,7 @@ The Bluesky Scanner application successfully builds and creates a functional exe
 - **Configuration**: ASAR disabled for easier debugging
 
 ### ✅ **Distribution Options:**
+
 1. **Zip Distribution**: Package the entire `win-unpacked` folder as a ZIP file
 2. **Manual Installation**: Users extract and run the executable directly
 3. **Network Sharing**: Copy folder to shared locations
@@ -21,32 +23,37 @@ The Bluesky Scanner application successfully builds and creates a functional exe
 ## 🔧 **Code Signing Issues to Resolve**
 
 ### **Problem:**
+
 ```
 ERROR: Cannot create symbolic link : A required privilege is not held by the client
 ```
 
 ### **Root Cause:**
+
 - Windows requires elevated privileges or Developer Mode for symbolic link creation
 - electron-builder's winCodeSign tools attempt to extract archives with symbolic links
 - Build fails during the packaging phase after successful compilation
 
 ### **Potential Solutions:**
 
-#### **Option 1: Windows Developer Mode** 
+#### **Option 1: Windows Developer Mode**
+
 - Enable Windows Developer Mode on build machine
 - Allows symbolic link creation without elevation
 - **Command**: Settings → Update & Security → For developers → Developer Mode
 
 #### **Option 2: Run as Administrator**
+
 - Run build commands in elevated PowerShell/Command Prompt
 - Provides necessary privileges for symbolic link operations
 
-#### **Option 3: Disable Code Signing** ⚠️ *Current Workaround*
+#### **Option 3: Disable Code Signing** ⚠️ _Current Workaround_
+
 ```json
 {
   "build": {
     "win": {
-      "target": [{"target": "zip", "arch": ["x64"]}]
+      "target": [{ "target": "zip", "arch": ["x64"] }]
     },
     "asar": false
   }
@@ -54,11 +61,13 @@ ERROR: Cannot create symbolic link : A required privilege is not held by the cli
 ```
 
 #### **Option 4: Code Signing Certificate**
+
 - Obtain proper code signing certificate
 - Configure certificate in build environment
 - Enable professional distribution with Windows trust
 
 ### **Current Configuration:**
+
 - ✅ Dependencies properly configured (moved @atproto/api to dependencies only)
 - ✅ ASAR disabled for easier debugging and dependency access
 - ✅ ZIP target to avoid installer creation issues
